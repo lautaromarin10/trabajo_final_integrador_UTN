@@ -40,7 +40,7 @@ Para esta versión inicial MVP, quedan explícitamente excluidos:
 
 ## Roles y Permisos Detallados
 
-Cliente
+#Cliente
 
 Permisos:
 - Consultar disponibilidad de habitaciones según fechas e integrantes.
@@ -49,7 +49,7 @@ Permisos:
 - Reprogramar fechas de sus reservas (sujeto a disponibilidad).
 - Cancelar sus propias reservas.
 
-Administrador
+#Administrador
 
 Permisos:
 - Visualizar la totalidad de las reservas del hotel en curso, futuras y pasadas.
@@ -75,15 +75,15 @@ Hosting: Neon (servidores en región SA/Brasil para menor latencia)
 
 ## Arquitectura y Estructura Prevista
 
-[ Cliente / Web Front-end ]  ---> (Next.js en Vercel)
+Cliente / Web Front-end  --->  Next.js en Vercel
                                        │
                                    HTTP / REST
                                        ▼
-[ API Back-end ]            ---> (FastAPI en Railway)
+API Back-end             --->  FastAPI en Railway
                                        │
                                   SQL Queries
                                        ▼
-[ Base de Datos Relacional] ---> (PostgreSQL en Neon)
+Base de Datos Relacional --->  PostgreSQL en Neon
 
 Entidades Principales del Modelo de Datos
 - Usuarios / Clientes: Datos personales y credenciales.
