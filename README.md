@@ -6,51 +6,90 @@
 - Tahiel Noé Heinze
 - Lautaro Marin
 
-## Propuesta del proyecto
+## Problema Explicado
 
-Para nuestro Trabajo Final Integrador proponemos desarrollar una aplicación web orientada a la gestión de reservas para establecimientos hoteleros. El sistema permitirá centralizar y organizar la información relacionada con las reservas, habitaciones y clientes, facilitando tanto la experiencia del huésped como las tareas administrativas del establecimiento.
+En el sector hotelero, la gestión manual o desorganizada de las reservas suele generar problemas recurrentes como la superposición de fechas, la falta de visibilidad en tiempo real sobre la disponibilidad de habitaciones y dificultades para mantener un historial centralizado de clientes. Esto no solo sobrecarga al personal administrativo, sino que impacta negativamente en la experiencia del huésped.
 
-La aplicación tendrá dos perfiles principales: Cliente y Administrador. El cliente podrá consultar la disponibilidad, realizar y gestionar sus propias reservas según las fechas de estadía y la cantidad de huéspedes. Por otro lado, el administrador contará con un panel de gestión desde el cual podrá supervisar las reservas actuales y futuras, consultar el estado de las habitaciones y acceder al historial de clientes.
+## Solución Concreta
 
-## Funcionalidades incluidas
+Proponemos el desarrollo de una aplicación web centralizada para la gestión integral de reservas hoteleras. El sistema automatiza el flujo de consulta, reserva y administración de habitaciones, permitiendo a los clientes gestionar su estadía de forma autónoma y brindando al personal administrativo un panel de control centralizado para supervisar la ocupación y el historial del establecimiento.
 
-### Cliente
+## MVP Definido y Acotado
 
-- Consultar la disponibilidad de habitaciones según las fechas de ingreso, egreso y la cantidad de huéspedes.
-- Crear una reserva seleccionando una habitación disponible.
-- Consultar el estado y los datos de su reserva.
-- Reprogramar una reserva, siempre que exista disponibilidad para las nuevas fechas
-- Cancelar una reserva.
+El MVP se enfoca estrictamente en el ciclo de vida esencial de una reserva y la gestión operativa básica del hotel:
 
-### Administrador
+- Gestión de Disponibilidad: Consulta de habitaciones según fechas y capacidad de huéspedes.
+- Ciclo de Reserva: Creación, consulta de datos/estado, reprogramación de fechas y cancelación por parte del cliente.
+- Panel de Administración: Visualización de reservas activas/futuras, estado de habitaciones por período y consulta de clientes.
 
-- Visualizar todas las reservas en curso y futuras.
-- Consultar el detalle y estado de cada reserva.
-- Cancelar reservas cuando sea necesario.
-- Consultar la disponibilidad y el estado de las habitaciones.
-- Identificar qué habitaciones se encuentran reservadas y durante qué período.
-- Consultar el historial de clientes y sus reservas anteriores.
+## Funcionalidades Posteriores
 
-## Funcionalidades excluidas
+Funcionalidades planeadas para etapas o versiones futuras post-entrega:
 
-En esta primera versión se excluye la implementación de un sistema de gestión y procesamiento de pagos. Esta funcionalidad queda fuera del alcance debido a las limitaciones de tiempo y recursos del proyecto, además de requerir consideraciones adicionales relacionadas con la seguridad y el tratamiento de información financiera.
+- Sistema de gestión de promociones, códigos de descuento y tarifas dinámicas por temporada.
+- Facturación automática y generación de comprobantes.
+- Gestión de servicios adicionales del hotel (room service, spa).
+- Notificaciones automáticas por correo electrónico (confirmación de reserva, recordatorios de check-in).
 
-También quedan fuera del alcance inicial otras funcionalidades complementarias, como la gestión de promociones y descuentos, facturación, integración con plataformas externas y servicios adicionales del establecimiento.
+## Fuera de Alcance
+
+Para esta versión inicial MVP, quedan explícitamente excluidos:
+
+- Procesamiento de pagos online: No se integrarán pasarelas de pago (Mercado Pago, etc.) por limitaciones de tiempo y alcance del proyecto, evitando además el manejo de datos financieros sensibles.
+- Integración con plataformas externas: No habrá sincronización con otros sistemas de reserva externos (Airbnb, etc.).
+
+## Roles y Permisos Detallados
+
+Cliente
+
+Permisos:
+- Consultar disponibilidad de habitaciones según fechas e integrantes.
+- Crear reservas seleccionando habitaciones disponibles.
+- Ver el detalle e historial de sus propias reservas.
+- Reprogramar fechas de sus reservas (sujeto a disponibilidad).
+- Cancelar sus propias reservas.
+
+Administrador
+
+Permisos:
+- Visualizar la totalidad de las reservas del hotel en curso, futuras y pasadas.
+- Consultar el estado y detalle de cualquier reserva.
+- Cancelar cualquier reserva en caso de ser necesario.
+- Consultar el estado de ocupación de las habitaciones por períodos específicos.
+- Acceder al historial completo de clientes y sus estadías previas.
 
 ## Stack Tecnológico
 
-En cuanto a las tecnologías utilizaremos lenguajes y frameworks modernos y reconocidos en la industria. Para el Frontend utilizaremos Next.js, acompañado de Tailwind CSS y shadcn/ui para el desarrollo de la interfaz. Esto nos permitirá construir una aplicación moderna, responsive y con componentes reutilizables
+Frontend:
+Framework: Next.js (React)
+Estilos y Componentes: Tailwind CSS + shadcn/ui
+Despliegue: Vercel
 
-Para el Backend utilizaremos Python junto con FastAPI, lo que nos permitirá desarrollar una API REST rápida, escalable y organizada. Además, FastAPI nos facilitará la validación de datos y la implementación de la lógica de negocio necesaria para gestionar los turnos
+Backend:
+Lenguaje y Framework: Python con FastAPI
+Despliegue: Railway
 
-Para la Base de Datos utilizaremos PostgreSQL, debido a que al tratarse de un sistema de turnos debemos tener entidades relacionadas, como usuarios, clientes, profesionales y turnos, lo que nos permitirá establecer relaciones claras entre los datos y garantizar la integridad y su consistencia.
+Base de Datos:
+Motor: PostgreSQL
+Hosting: Neon (servidores en región SA/Brasil para menor latencia)
 
-En cuanto al despliegue del proyecto, proponemos utilizar Vercel para el Frontend, ya que al ser la plataforma desarrolladora de Next.js nos proporicona una integración muy sencilla con el framework, además de que facilita el despliegue mediante repositorios de GitHub
+## Arquitectura y Estructura Prevista
 
-Para el Backend, consideramos utilizar Railway, ya que consideramos que se adapta a las necesidades del proyecto y a los recursos disponibles, además de su facilidad de configuración y despliegue.
+[ Cliente / Web Front-end ]  ---> (Next.js en Vercel)
+                                       │
+                                   HTTP / REST
+                                       ▼
+[ API Back-end ]            ---> (FastAPI en Railway)
+                                       │
+                                  SQL Queries
+                                       ▼
+[ Base de Datos Relacional] ---> (PostgreSQL en Neon)
 
-Por último, para alojar nuestra Base de Datos pOstgreSQL utilizaremos Neon, ya que ofrece planes gratuitos adecuados a las necesidades del proyecto y cuenta con infraestructura en regiones cercanas a Argentina, como Brasil, lo que nos permitirá reducir la latencia en la conexión con la base de datos.
+Entidades Principales del Modelo de Datos
+- Usuarios / Clientes: Datos personales y credenciales.
+- Habitaciones: Tipo, capacidad, precio y estado.
+- Reservas: Relación entre cliente, habitación, fechas de check-in/check-out y estado de la reserva.
 
-## Enlace al Repositorio
+## Repositorio
 
 https://github.com/lautaromarin10/trabajo_final_integrador_UTN
