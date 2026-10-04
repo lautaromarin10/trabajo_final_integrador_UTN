@@ -11,7 +11,7 @@ Para realizar el MVP es necesario realizar los siguientes módulos
 2. Módulo de habitaciones
 
 - listado de habitaciones
-- tipo de habitación
+- gestión de tipo de habitación (nombre, descripción, capacidades de adultos y niños, cantidad de camas y precio base).
 - capacidad
 - estado
 - limpieza
@@ -25,7 +25,7 @@ Para realizar el MVP es necesario realizar los siguientes módulos
 
 4. Módulo de reservas
 
-- creación
+- creación de reservas vinculando al cliente, las fechas y el detalle de la(s) habitación(es) seleccionada(s)
 - consulta
 - cancelación
 - reprogramación
