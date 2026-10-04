@@ -8,9 +8,10 @@ erDiagram
     USUARIO_PORTAL o|--o{ RESERVA : crea
     RESERVA ||--o{ HISTORIAL_ESTADO_RESERVA : registra
 
-    RESERVA ||--o{ RESERVA_HUESPED : incluye
-    HUESPED ||--o{ RESERVA_HUESPED : participa
-    HABITACION ||--o{ RESERVA_HUESPED : ocupa
+    RESERVA ||--o{ DETALLE_RESERVA : incluye
+    HABITACION ||--o{ DETALLE_RESERVA : ocupa
+
+    RESERVA ||--o{ HUESPED : tiene
 
     PERSONA ||--o| CLIENTE : es
     PERSONA ||--o| HUESPED : es
@@ -35,6 +36,7 @@ erDiagram
         int capacidad_ninos
         int cantidad_camas
         float tamanio_m2
+        float precio
     }
 
     HABITACION {
@@ -113,16 +115,17 @@ erDiagram
         string motivo
     }
 
-    HUESPED {
-        int id PK
-        int persona_id FK
-    }
-
-    RESERVA_HUESPED {
+    DETALLE_RESERVA {
         int id PK
         int reserva_id FK
-        int huesped_id FK
         int habitacion_id FK
+        float precio_unitario
+    }
+
+    HUESPED {
+        int id PK
+        int reserva_id FK
+        int persona_id FK
     }
 ```
 
