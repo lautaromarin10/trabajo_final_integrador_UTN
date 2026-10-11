@@ -10,7 +10,6 @@ from app.core.roles import PortalRole
 from app.core.security import decode_access_token
 from app.models.portal_user import PortalUser
 
-
 bearer_scheme = HTTPBearer(auto_error=False)
 
 

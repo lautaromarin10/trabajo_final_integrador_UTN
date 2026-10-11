@@ -14,13 +14,22 @@ from app.schemas.portal_user import (
 )
 from app.services.portal_user import (
     create_portal_user as create_portal_user_service,
+)
+from app.services.portal_user import (
     delete_portal_user as delete_portal_user_service,
+)
+from app.services.portal_user import (
     get_portal_user as get_portal_user_service,
+)
+from app.services.portal_user import (
     get_portal_users as get_portal_users_service,
+)
+from app.services.portal_user import (
     reactivate_portal_user as reactivate_portal_user_service,
+)
+from app.services.portal_user import (
     update_portal_user as update_portal_user_service,
 )
-
 
 router = APIRouter(
     prefix="/portal-user",

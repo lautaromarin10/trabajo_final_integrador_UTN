@@ -1,11 +1,10 @@
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import bcrypt
 import jwt
 
 from app.core.roles import PortalRole
-
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 JWT_ALGORITHM = "HS256"
@@ -16,7 +15,7 @@ def create_access_token(subject: str, role: PortalRole) -> str:
     if not secret_key:
         raise RuntimeError("La variable JWT_SECRET_KEY es requerida")
 
-    expires_at = datetime.now(timezone.utc) + timedelta(
+    expires_at = datetime.now(UTC) + timedelta(
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
     return jwt.encode(

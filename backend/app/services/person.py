@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import HTTPException
 from sqlalchemy import func
@@ -33,9 +33,7 @@ def _ensure_document_available(
 
 
 def create_person(data: PersonCreate, session: Session) -> Person:
-    _ensure_document_available(
-        session, data.tipo_documento, data.numero_documento
-    )
+    _ensure_document_available(session, data.tipo_documento, data.numero_documento)
 
     person = Person(**data.model_dump())
 
@@ -43,6 +41,7 @@ def create_person(data: PersonCreate, session: Session) -> Person:
     session.commit()
     session.refresh(person)
     return person
+
 
 def get_persons(
     session: Session,
@@ -63,9 +62,7 @@ def get_persons(
     if numero_documento:
         filters.append(col(Person.numero_documento) == numero_documento)
 
-    total = session.exec(
-        select(func.count()).select_from(Person).where(*filters)
-    ).one()
+    total = session.exec(select(func.count()).select_from(Person).where(*filters)).one()
     items = session.exec(
         select(Person)
         .where(*filters)
@@ -80,6 +77,7 @@ def get_persons(
         hasPrevPage=skip > 0 and total > 0,
     )
 
+
 def get_person(
     session: Session,
     person_id: int,
@@ -93,11 +91,8 @@ def get_person(
 
     return person
 
-def update_person(
-        session: Session,
-        person_id: int,
-        data: PersonUpdate
-) -> Person:
+
+def update_person(session: Session, person_id: int, data: PersonUpdate) -> Person:
 
     person = get_person(session, person_id)
     update_data = data.model_dump(exclude_unset=True)
@@ -118,21 +113,19 @@ def update_person(
     for key, value in update_data.items():
         setattr(person, key, value)
 
-    person.updated_at = datetime.now(timezone.utc)
+    person.updated_at = datetime.now(UTC)
     session.add(person)
     session.commit()
     session.refresh(person)
     return person
 
-def delete_person(
-        session: Session,
-        person_id: int
-) -> Person:
+
+def delete_person(session: Session, person_id: int) -> Person:
 
     person = get_person(session, person_id)
     person.deleted = True
-    person.deleted_at = datetime.now(timezone.utc)
-    person.updated_at = datetime.now(timezone.utc)
+    person.deleted_at = datetime.now(UTC)
+    person.updated_at = datetime.now(UTC)
     session.add(person)
     session.commit()
     session.refresh(person)
@@ -154,7 +147,7 @@ def reactivate_person(session: Session, person_id: int) -> Person:
     )
     person.deleted = False
     person.deleted_at = None
-    person.updated_at = datetime.now(timezone.utc)
+    person.updated_at = datetime.now(UTC)
     session.add(person)
     session.commit()
     session.refresh(person)

@@ -1,6 +1,4 @@
-
 from datetime import date
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -15,7 +13,7 @@ class PersonBase(BaseModel):
     numero_documento: str = Field(..., examples=["12345678"])
     fecha_nacimiento: date = Field(..., examples=["1990-01-15"])
     nacionalidad: str = Field(..., examples=["Argentina"])
-    observaciones: Optional[str] = Field(None, examples=[""])
+    observaciones: str | None = Field(None, examples=[""])
 
 
 class PersonCreate(PersonBase):
@@ -23,15 +21,13 @@ class PersonCreate(PersonBase):
 
 
 class PersonUpdate(BaseModel):
-    nombre: Optional[str] = Field(None, examples=["Ana"])
-    apellido: Optional[str] = Field(None, examples=["Pérez"])
-    tipo_documento: Optional[str] = Field(None, examples=["DNI"])
-    numero_documento: Optional[str] = Field(None, examples=["12345678"])
-    fecha_nacimiento: Optional[date] = Field(
-        None, examples=["1990-01-15"]
-    )
-    nacionalidad: Optional[str] = Field(None, examples=["Argentina"])
-    observaciones: Optional[str] = Field(None, examples=[""])
+    nombre: str | None = Field(None, examples=["Ana"])
+    apellido: str | None = Field(None, examples=["Pérez"])
+    tipo_documento: str | None = Field(None, examples=["DNI"])
+    numero_documento: str | None = Field(None, examples=["12345678"])
+    fecha_nacimiento: date | None = Field(None, examples=["1990-01-15"])
+    nacionalidad: str | None = Field(None, examples=["Argentina"])
+    observaciones: str | None = Field(None, examples=[""])
 
     @field_validator(
         "nombre",
@@ -56,7 +52,7 @@ class PersonRead(GenericSchema):
     numero_documento: str
     fecha_nacimiento: date
     nacionalidad: str
-    observaciones: Optional[str] = None
+    observaciones: str | None = None
 
 
 class PersonPage(BaseModel):

@@ -22,6 +22,7 @@ Password = Annotated[
     AfterValidator(validate_password_strength),
 ]
 
+
 # Usar en validadores de schemas para rechazar null en campos opcionales de PATCH
 # que pueden omitirse, pero no deben limpiarse explícitamente.
 def reject_null_value(value: Any) -> Any:

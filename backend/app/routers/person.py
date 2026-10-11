@@ -8,13 +8,22 @@ from app.models.person import Person
 from app.schemas.person import PersonCreate, PersonPage, PersonRead, PersonUpdate
 from app.services.person import (
     create_person as create_person_service,
+)
+from app.services.person import (
     delete_person as delete_person_service,
+)
+from app.services.person import (
     get_person as get_person_service,
+)
+from app.services.person import (
     get_persons as get_persons_service,
+)
+from app.services.person import (
     reactivate_person as reactivate_person_service,
+)
+from app.services.person import (
     update_person as update_person_service,
 )
-
 
 router = APIRouter(
     prefix="/person",

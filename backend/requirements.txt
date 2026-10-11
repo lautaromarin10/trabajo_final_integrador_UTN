@@ -3,3 +3,4 @@ sqlmodel
 psycopg
 bcrypt
 PyJWT
+ruff

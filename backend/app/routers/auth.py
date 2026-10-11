@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
@@ -17,7 +17,6 @@ from app.schemas.portal_user import PortalUserProfile, PortalUserRead
 from app.services.portal_user import (
     register_portal_user as register_portal_user_service,
 )
-
 
 router = APIRouter(prefix="/auth", tags=["Autorización"])
 
@@ -66,7 +65,7 @@ def login_user(credentials: LoginRequest, session: SessionDep) -> LoginResponse:
         )
 
     token = create_access_token(portal_user.email, portal_user.role)
-    portal_user.ultimo_ingreso = datetime.now(timezone.utc)
+    portal_user.ultimo_ingreso = datetime.now(UTC)
     session.add(portal_user)
     session.commit()
 

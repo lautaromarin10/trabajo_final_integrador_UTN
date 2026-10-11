@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
@@ -10,6 +9,7 @@ from app.utils.validators import Password, reject_null_value
 
 # No hice PortalUserBase porque cada Schema tiene sus propios campos y no se repite en ninguno de ellos.
 
+
 class PortalUserCreate(BaseModel):
     persona_id: int = Field(..., gt=0, examples=[1])
     email: EmailStr = Field(..., max_length=255, examples=["test@gmail.com"])
@@ -19,9 +19,9 @@ class PortalUserCreate(BaseModel):
 class PortalUserUpdate(PersonUpdate):
     model_config = ConfigDict(extra="forbid")
 
-    persona_id: Optional[int] = Field(None, gt=0, examples=[1])
-    role: Optional[PortalRole] = Field(None, examples=[PortalRole.USER])
-    password: Optional[Password] = Field(None, examples=["Clave!123"])
+    persona_id: int | None = Field(None, gt=0, examples=[1])
+    role: PortalRole | None = Field(None, examples=[PortalRole.USER])
+    password: Password | None = Field(None, examples=["Clave!123"])
 
     @field_validator("role", "password", mode="before")
     @classmethod
@@ -34,11 +34,11 @@ class PortalUserRead(GenericSchema):
     persona_id: int
     role: PortalRole
     email: EmailStr
-    ultimo_ingreso: Optional[datetime] = None
+    ultimo_ingreso: datetime | None = None
 
 
 class PortalUserProfile(PortalUserRead):
-    persona: Optional[PersonRead] = None
+    persona: PersonRead | None = None
 
 
 class PortalUserPage(BaseModel):
