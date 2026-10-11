@@ -1,0 +1,99 @@
+@baseUrl = http://localhost:8000
+@email = prueba@admin.com
+@password = pruebaPassword
+@registerEmail = nuevo-usuario@example.com
+@registerPassword = Clave!123
+
+### Crear cuenta de usuario
+# Esperado: 201; crea una persona y su usuario portal con rol "user".
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "apellido": "Pérez",
+  "tipo_documento": "DNI",
+  "numero_documento": "12345678",
+  "fecha_nacimiento": "1990-01-15",
+  "nacionalidad": "Argentina",
+  "email": "{{registerEmail}}",
+  "password": "{{registerPassword}}"
+}
+
+### Rechazar la asignación de rol en el registro público
+# Esperado: 422
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nombre": "Admin",
+  "apellido": "Prueba",
+  "tipo_documento": "DNI",
+  "numero_documento": "87654321",
+  "fecha_nacimiento": "1990-01-15",
+  "nacionalidad": "Argentina",
+  "email": "otro-usuario@example.com",
+  "password": "{{registerPassword}}",
+  "role": "admin"
+}
+
+### Iniciar sesión con credenciales válidas
+# Esperado: 200; responde access_token, token_type "bearer" y expires_in 1800.
+# Configurá email y password con una cuenta existente.
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Obtener el perfil del usuario autenticado
+# Esperado: 200; incluye los datos de la cuenta y la persona vinculada.
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{login.response.body.$.access_token}}
+
+### Rechazar consulta de perfil sin autenticación
+# Esperado: 401
+GET {{baseUrl}}/auth/me
+
+### Rechazar una contraseña incorrecta
+# Esperado: 401
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "wrong-password"
+}
+
+### Rechazar un email que no corresponde a una cuenta
+# Esperado: 401
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "no-existe@example.com",
+  "password": "SomePassword123"
+}
+
+### Rechazar un email con formato inválido
+# Esperado: 422
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "email-invalido",
+  "password": "{{password}}"
+}
+
+### Rechazar una solicitud sin contraseña
+# Esperado: 422
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
