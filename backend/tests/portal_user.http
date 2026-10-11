@@ -1,0 +1,173 @@
+@baseUrl = http://localhost:8000
+@adminEmail = prueba@admin.com
+@adminPassword = pruebaPassword
+@personaId = 1
+@testEmail = portal-user-{{$guid}}@test.com
+@testPassword = TestPassword!123
+@updatedPassword = UpdatedPassword!123
+
+### Iniciar sesión como administrador existente
+# Esperado: 200
+# Reemplazá adminEmail, adminPassword y personaId por valores válidos.
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+### Listar sin autenticación
+# Esperado: 401
+GET {{baseUrl}}/portal-user/
+
+### Crear usuario portal
+# Esperado: 201; el usuario creado debe tener role "user".
+# @name createPortalUser
+POST {{baseUrl}}/portal-user/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "persona_id": {{personaId}},
+  "email": "{{testEmail}}",
+  "password": "{{testPassword}}"
+}
+
+### Crear otro usuario con el mismo email
+# Esperado: 409
+POST {{baseUrl}}/portal-user/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "persona_id": {{personaId}},
+  "email": "{{createPortalUser.response.body.$.email}}",
+  "password": "{{testPassword}}"
+}
+
+### Listar usuarios portal
+# Esperado: 200; respuesta con total, items, hasNextPage y hasPrevPage.
+GET {{baseUrl}}/portal-user/?email=portal-user&role=user&skip=0&limit=20
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### Consultar el usuario creado
+# Esperado: 200
+GET {{baseUrl}}/portal-user/{{createPortalUser.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### Iniciar sesión como usuario común
+# Esperado: 200
+# @name userLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{createPortalUser.response.body.$.email}}",
+  "password": "{{testPassword}}"
+}
+
+### Usuario común modifica sus propios datos personales
+# Esperado: 200
+PATCH {{baseUrl}}/portal-user/{{createPortalUser.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "nombre": "Nombre actualizado"
+}
+
+### Usuario común no puede cambiar su rol
+# Esperado: 403
+PATCH {{baseUrl}}/portal-user/{{createPortalUser.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "role": "admin"
+}
+
+### Denegar acceso de usuario común
+# Esperado: 403
+GET {{baseUrl}}/portal-user/
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### Actualizar contraseña y rol
+# Esperado: 200; valida que la respuesta refleje el rol "admin".
+PATCH {{baseUrl}}/portal-user/{{createPortalUser.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "password": "{{updatedPassword}}",
+  "role": "admin"
+}
+
+### Iniciar sesión con la contraseña actualizada
+# Esperado: 200
+# @name updatedUserLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{createPortalUser.response.body.$.email}}",
+  "password": "{{updatedPassword}}"
+}
+
+### Rechazar campos null en la actualización
+# Esperado: 422
+PATCH {{baseUrl}}/portal-user/{{createPortalUser.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "role": null
+}
+
+### Eliminar usuario portal (borrado lógico)
+# Esperado: 204
+DELETE {{baseUrl}}/portal-user/{{createPortalUser.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### El usuario eliminado ya no se puede consultar
+# Esperado: 404
+GET {{baseUrl}}/portal-user/{{createPortalUser.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### No se puede volver a crear una cuenta eliminada con el mismo email
+# Esperado: 409
+POST {{baseUrl}}/portal-user/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "persona_id": {{personaId}},
+  "email": "{{createPortalUser.response.body.$.email}}",
+  "password": "{{testPassword}}"
+}
+
+### Reactivar el usuario eliminado
+# Esperado: 200; conserva su ID y contraseña.
+POST {{baseUrl}}/portal-user/{{createPortalUser.response.body.$.id}}/reactivate
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### Iniciar sesión luego de reactivar el usuario
+# Esperado: 200; la contraseña actualizada antes de eliminarlo sigue vigente.
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{createPortalUser.response.body.$.email}}",
+  "password": "{{updatedPassword}}"
+}
+
+### Rechazar un ID menor o igual a cero
+# Esperado: 422
+GET {{baseUrl}}/portal-user/0
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### Rechazar un límite fuera del rango permitido
+# Esperado: 422
+GET {{baseUrl}}/portal-user/?limit=101
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}

@@ -1,3 +1,6 @@
 fastapi[standard]
 sqlmodel
 psycopg
+bcrypt
+PyJWT
+ruff

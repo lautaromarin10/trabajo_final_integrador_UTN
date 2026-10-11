@@ -17,7 +17,6 @@ erDiagram
     PERSONA ||--o| HUESPED : es
     PERSONA ||--o| USUARIO_PORTAL : es
 
-    ROL ||--o{ USUARIO_PORTAL : asigna
     ORIGEN_CLIENTE ||--o{ CLIENTE : define
 
     HOTEL {
@@ -76,15 +75,10 @@ erDiagram
         string nombre
     }
 
-    ROL {
-        int id PK
-        string nombre
-    }
-
     USUARIO_PORTAL {
         int id PK
         int persona_id FK
-        int rol_id FK
+        string role "admin | user"
         string email
         string password_hash
         datetime ultimo_ingreso
@@ -134,7 +128,7 @@ erDiagram
 - Todas las tablas van a contar con las siguientes columnas base:
   - datetime created_at
   - datetime updated_at
-  - boolean delete
+  - boolean deleted
   - datetime deleted_at
 
 - Todos los registros deben ser marcados como eliminados con soft delete.
