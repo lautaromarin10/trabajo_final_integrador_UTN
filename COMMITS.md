@@ -6,12 +6,18 @@ En la etapa de desarrollo, todos los commits que se realicen deberán tener la s
 [BACK/FRONT/RAIZ]categoria(modulo): mensaje autoexplicativo
 ```
 
+- Si un cambio afecta a más de un área, se pueden combinar las etiquetas con `&`,
+  por ejemplo `[FRONT&RAIZ]`.
+- Las etiquetas válidas son `BACK`, `FRONT` y `RAIZ`.
+- El módulo y el mensaje deben describir el cambio realizado.
+
 - Ejemplos prácticos
 
 ```bash
 [FRONT]hotfix(reserva): mensaje 1
 [BACK]feature(login): mensaje 2
 [RAIZ]documentation(gitignore): mensaje 3
+[FRONT&RAIZ]documentation(frontend): documenta la configuración del frontend
 ```
 
 ## Matriz de categorización
@@ -27,3 +33,17 @@ Lista de etiquetas a utilizar:
 7. technical-debt: Utilizada para identificar código, decisiones técnicas o implementaciones que requieren una mejora para mantener la calidad, mantenibilidad o escalabilidad.
 8. testing: Utilizada para cambios relacionados en incorporación, modificación o mantenimiento de pruebas automatizadas.
 9. hotfix: Utilizada para correcciones urgentes de errores críticos que requieren una solución rapida.
+
+## Validaciones de Git
+
+Los hooks del repositorio ejecutan estas validaciones antes de crear cada commit:
+
+- Cambios staged en `frontend/`: `pnpm lint` y `pnpm exec tsc --noEmit`.
+- Cambios staged en `backend/`: `ruff check app` y compilación de los módulos Python.
+- Mensaje del commit: verifica etiquetas, categoría, módulo y descripción según la convención anterior.
+
+Para habilitarlos en cada clon del repositorio, ejecutar desde la raíz:
+
+```bash
+git config core.hooksPath .githooks
+```

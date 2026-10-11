@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+
+message_file=$1
+subject=''
+IFS= read -r subject < "$message_file" || true
+
+pattern='^\[(BACK|FRONT|RAIZ)(&((BACK|FRONT|RAIZ)))*\](bug|documentation|feature|refactor|chore|core|technical-debt|testing|hotfix)\([[:alnum:]_-]+\): .+$'
+
+if ! printf '%s\n' "$subject" | grep -Eq "$pattern"; then
+    echo "Mensaje de commit inválido: $subject" >&2
+    echo "Formato esperado: [BACK/FRONT/RAIZ]categoria(modulo): mensaje" >&2
+    echo "Se permiten etiquetas combinadas, por ejemplo [FRONT&RAIZ]." >&2
+    exit 1
+fi
