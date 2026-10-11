@@ -1,0 +1,66 @@
+@baseUrl = http://localhost:8000
+@adminEmail = prueba@admin.com
+@adminPassword = pruebaPassword
+@documentNumber = {{$guid}}
+
+### Iniciar sesión como administrador
+# Esperado: 200
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+### Crear persona
+# Esperado: 201
+# @name createPerson
+POST {{baseUrl}}/person/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "nombre": "Prueba",
+  "apellido": "Persona",
+  "tipo_documento": "DNI",
+  "numero_documento": "{{documentNumber}}",
+  "fecha_nacimiento": "1990-01-15",
+  "nacionalidad": "Argentina"
+}
+
+### Filtrar personas y paginar resultados
+# Esperado: 200; respuesta con total, items, hasNextPage y hasPrevPage.
+GET {{baseUrl}}/person/?nombre=Prue&tipo_documento=DNI&skip=0&limit=10
+Authorization: ******
+
+### Eliminar persona
+# Esperado: 204
+DELETE {{baseUrl}}/person/{{createPerson.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### No permitir duplicar una persona eliminada
+# Esperado: 409
+POST {{baseUrl}}/person/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "nombre": "Prueba",
+  "apellido": "Persona",
+  "tipo_documento": "DNI",
+  "numero_documento": "{{documentNumber}}",
+  "fecha_nacimiento": "1990-01-15",
+  "nacionalidad": "Argentina"
+}
+
+### Reactivar la persona eliminada
+# Esperado: 200; conserva su ID.
+POST {{baseUrl}}/person/{{createPerson.response.body.$.id}}/reactivate
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### Consultar persona reactivada
+# Esperado: 200
+GET {{baseUrl}}/person/{{createPerson.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
