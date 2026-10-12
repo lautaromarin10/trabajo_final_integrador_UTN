@@ -159,3 +159,7 @@ p {
 @utility title-sm {
   @apply text-base sm:text-lg;
 }
+
+@utility min-h-screen-and-header {
+  @apply min-h-[calc(100svh-5rem)];
+}

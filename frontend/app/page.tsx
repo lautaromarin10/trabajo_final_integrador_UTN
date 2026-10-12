@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <section className="relative flex min-h-[calc(100svh-5rem)] flex-col items-center">
+    <section className="relative flex min-h-screen-and-header flex-col items-center">
       <div className="container mx-auto flex items-center justify-center py-12 text-center [@media(orientation:landscape)_and_(max-height:500px)]:py-2">
         <div className="flex flex-col items-center text-center max-w-prose">
           <Badge variant={"secondary"} className="mb-2">
