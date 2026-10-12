@@ -1,5 +1,3 @@
-from typing import Literal
-
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.schemas.person import PersonBase
@@ -19,6 +17,4 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    access_token: str
-    token_type: Literal["bearer"] = "bearer"
     expires_in: int = 30 * 60

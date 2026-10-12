@@ -1,7 +1,7 @@
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Cookie, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlmodel import select
 
@@ -19,17 +19,19 @@ def get_current_user(
         Depends(bearer_scheme),
     ],
     session: SessionDep,
+    access_token: Annotated[str | None, Cookie()] = None,
 ) -> PortalUser:
     unauthorized = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Autenticación requerida",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    if credentials is None:
+    token = credentials.credentials if credentials else access_token
+    if token is None:
         raise unauthorized
 
     try:
-        email = decode_access_token(credentials.credentials)
+        email = decode_access_token(token)
     except jwt.InvalidTokenError:
         raise unauthorized from None
 

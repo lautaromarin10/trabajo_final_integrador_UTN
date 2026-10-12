@@ -39,7 +39,7 @@ Content-Type: application/json
 }
 
 ### Iniciar sesión con credenciales válidas
-# Esperado: 200; responde access_token, token_type "bearer" y expires_in 1800.
+# Esperado: 200; establece una cookie HttpOnly "access_token" y responde expires_in.
 # Configurá email y password con una cuenta existente.
 # @name login
 POST {{baseUrl}}/auth/login
