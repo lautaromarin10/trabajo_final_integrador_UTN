@@ -19,7 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="">
         <Header />
-        <main className="translate-y-20">{children}</main>
+        <main>{children}</main>
       </body>
     </html>
   );
