@@ -9,7 +9,7 @@ const Page = () => {
         <Logo />
         <h1 className="title-lg">Iniciar sesión</h1>
       </div>
-      <div className="flex flex-col items-center border-2 border-muted rounded-2xl min-h-fit w-full max-w-sm p-6 sm:p-8">
+      <div className="flex flex-col items-center border-2 border-muted rounded-2xl min-h-fit w-full max-w-sm p-4 sm:p-8">
         <SignInForm />
         <div className="mt-4">
           <p className="text-sm">

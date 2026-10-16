@@ -20,8 +20,8 @@ const useSignInForm = () => {
     },
   });
 
-  const [viewPassword, setViewPassword] = useState(false);
-  const [signInError, setSignInError] = useState("");
+  const [viewPassword, setViewPassword] = useState<boolean>(false);
+  const [signInError, setSignInError] = useState<string>("");
 
   const handleViewPassword = () => {
     setViewPassword(!viewPassword);
@@ -39,7 +39,9 @@ const useSignInForm = () => {
       router.replace(user.role === "admin" ? "/admin" : "/user");
     },
     onError: () => {
-      setSignInError("No se pudo iniciar sesión. Verificá tus datos e intentá nuevamente.");
+      setSignInError(
+        "No se pudo iniciar sesión. Verificá tus datos e intentá nuevamente.",
+      );
     },
   });
 

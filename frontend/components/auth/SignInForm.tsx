@@ -33,7 +33,7 @@ const SignInForm = () => {
       )}
       <form className="w-full h-full" onSubmit={handleSubmit(onSubmit)}>
         <FieldGroup className="gap-4">
-          <Field data-invalid={errors.email ? true : false}>
+          <Field data-invalid={Boolean(errors.email)}>
             <FieldLabel>Correo electrónico</FieldLabel>
             <Input
               {...register("email", {
@@ -43,13 +43,13 @@ const SignInForm = () => {
                   message: "Ingresá un email valido",
                 },
               })}
-              aria-invalid={errors.email ? true : false}
+              aria-invalid={Boolean(errors.email)}
               type="email"
               placeholder="Tu correo electrónico"
             />
             <FieldError>{errors.email?.message}</FieldError>
           </Field>
-          <Field data-invalid={errors.password ? true : false}>
+          <Field data-invalid={Boolean(errors.password)}>
             <FieldLabel>Contraseña</FieldLabel>
             <div className="w-full flex group relative">
               <Input
@@ -60,7 +60,7 @@ const SignInForm = () => {
                     message: "Ingresá una contraseña valida",
                   },
                 })}
-                aria-invalid={errors.password ? true : false}
+                aria-invalid={Boolean(errors.password)}
                 type={viewPassword ? "text" : "password"}
                 placeholder="Contraseña"
                 className="pr-10"
