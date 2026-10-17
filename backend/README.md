@@ -26,7 +26,7 @@ python -m pip install -r requirements.txt
 Desde la carpeta backend, con el entorno virtual activado
 
 ```bash
-uvicorn main:app --reload --env-file ../.env
+uvicorn main:app --reload --env-file .env
 ```
 
 ## Documentación
@@ -35,4 +35,4 @@ uvicorn main:app --reload --env-file ../.env
 
 ### Consideración
 
-- Tener configurado **DATABASE_URL** en .env de la raíz del repositorio.
+- Tener configurado **DATABASE_URL** en el archivo .env, ubicado en la carpeta raíz **backend**
