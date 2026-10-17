@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import useSignInForm from "@/hooks/auth/useSignInForm";
-import { REGEX_EMAIL, REGEX_PASSWORD } from "@/utils/auth/regex";
+import { REGEX_EMAIL } from "@/utils/auth/regex";
 import { Eye, EyeClosed, InfoIcon } from "lucide-react";
 import { Alert, AlertDescription } from "../ui/alert";
 
@@ -55,10 +55,6 @@ const SignInForm = () => {
               <Input
                 {...register("password", {
                   required: "La contraseña es requerida",
-                  pattern: {
-                    value: REGEX_PASSWORD,
-                    message: "Ingresá una contraseña valida",
-                  },
                 })}
                 aria-invalid={Boolean(errors.password)}
                 type={viewPassword ? "text" : "password"}
