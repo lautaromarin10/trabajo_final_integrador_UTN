@@ -23,6 +23,7 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-success: oklch(0.7 0.2097 145.06);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -158,4 +159,8 @@ p {
 
 @utility title-sm {
   @apply text-base sm:text-lg;
+}
+
+@utility min-h-screen-and-header {
+  @apply min-h-[calc(100svh-5rem)];
 }

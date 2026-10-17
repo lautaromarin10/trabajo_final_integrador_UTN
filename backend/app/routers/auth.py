@@ -1,6 +1,7 @@
+import os
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Response, status
 from sqlmodel import select
 
 from app.core.auth import CurrentUserDep
@@ -19,6 +20,8 @@ from app.services.portal_user import (
 )
 
 router = APIRouter(prefix="/auth", tags=["Autorización"])
+ACCESS_TOKEN_COOKIE = "access_token"
+COOKIE_SECURE = os.getenv("PRODUCTION", "false").strip().lower() == "true"
 
 
 @router.post(
@@ -47,7 +50,11 @@ def get_current_user_profile(
 
 
 @router.post("/login", response_model=LoginResponse)
-def login_user(credentials: LoginRequest, session: SessionDep) -> LoginResponse:
+def login_user(
+    credentials: LoginRequest,
+    response: Response,
+    session: SessionDep,
+) -> LoginResponse:
     portal_user = session.exec(
         select(PortalUser).where(
             PortalUser.email == credentials.email,
@@ -69,7 +76,28 @@ def login_user(credentials: LoginRequest, session: SessionDep) -> LoginResponse:
     session.add(portal_user)
     session.commit()
 
+    response.set_cookie(
+        key=ACCESS_TOKEN_COOKIE,
+        value=token,
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=True,
+        secure=COOKIE_SECURE,
+        samesite="lax",
+        path="/",
+    )
     return LoginResponse(
-        access_token=token,
         expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
+
+
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout_user() -> Response:
+    response = Response(status_code=status.HTTP_204_NO_CONTENT)
+    response.delete_cookie(
+        key=ACCESS_TOKEN_COOKIE,
+        httponly=True,
+        secure=COOKIE_SECURE,
+        samesite="lax",
+        path="/",
+    )
+    return response

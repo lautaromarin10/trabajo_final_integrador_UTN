@@ -15,9 +15,9 @@ def validate_password_strength(value: str) -> str:
 Password = Annotated[
     str,
     Field(
-        min_length=6,
+        min_length=8,
         max_length=128,
-        description="Mínimo 6 caracteres, una mayúscula y un símbolo",
+        description="Mínimo 8 caracteres, una mayúscula y un símbolo",
     ),
     AfterValidator(validate_password_strength),
 ]

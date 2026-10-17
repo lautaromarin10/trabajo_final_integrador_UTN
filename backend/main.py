@@ -1,4 +1,7 @@
+import os
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import create_db_and_tables
 from app.routers.auth import router as auth_router
@@ -9,8 +12,18 @@ from app.routers.portal_user import router as portal_user_router
 
 def create_app() -> FastAPI:
 
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "")
+
     app = FastAPI(
         title="Backend | Integrador UTN",
+    )
+
+    app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
     )
 
     # ROUTERS
