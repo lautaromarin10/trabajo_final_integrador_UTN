@@ -29,6 +29,10 @@ Desde la carpeta backend, con el entorno virtual activado
 uvicorn main:app --reload --env-file ../.env
 ```
 
+## Documentación
+
+- [Responsabilidades de las capas](./docs/architecture.md)
+
 ### Consideración
 
 - Tener configurado **DATABASE_URL** en .env de la raíz del repositorio.
