@@ -16,7 +16,11 @@ export const signInUser = async (email: string, password: string) => {
     });
 
     if (!response.ok) {
-      throw new Error("Error, STATUS: " + response.status);
+      const errorData = await response.json();
+
+      throw new Error(
+        errorData.detail || "Ocurrió un error al iniciar sesión.",
+      );
     }
 
     const data = await response.json();
