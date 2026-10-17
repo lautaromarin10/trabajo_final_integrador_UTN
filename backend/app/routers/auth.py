@@ -2,16 +2,14 @@ import os
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, HTTPException, Response, status
-from sqlmodel import select
 
 from app.core.auth import CurrentUserDep
-from app.core.database import SessionDep
+from app.core.database import UnitOfWorkDep
 from app.core.security import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     create_access_token,
     verify_password,
 )
-from app.models.person import Person
 from app.models.portal_user import PortalUser
 from app.schemas.auth import LoginRequest, LoginResponse, RegisterRequest
 from app.schemas.portal_user import PortalUserProfile, PortalUserRead
@@ -29,17 +27,17 @@ COOKIE_SECURE = os.getenv("PRODUCTION", "false").strip().lower() == "true"
     response_model=PortalUserRead,
     status_code=status.HTTP_201_CREATED,
 )
-def register_user(data: RegisterRequest, session: SessionDep) -> PortalUser:
-    return register_portal_user_service(data, session)
+def register_user(data: RegisterRequest, unit_of_work: UnitOfWorkDep) -> PortalUser:
+    return register_portal_user_service(data, unit_of_work)
 
 
 @router.get("/me", response_model=PortalUserProfile)
 def get_current_user_profile(
     current_user: CurrentUserDep,
-    session: SessionDep,
+    unit_of_work: UnitOfWorkDep,
 ) -> dict:
     person = (
-        session.get(Person, current_user.persona_id)
+        unit_of_work.persons.get(current_user.persona_id)
         if current_user.persona_id is not None
         else None
     )
@@ -53,14 +51,9 @@ def get_current_user_profile(
 def login_user(
     credentials: LoginRequest,
     response: Response,
-    session: SessionDep,
+    unit_of_work: UnitOfWorkDep,
 ) -> LoginResponse:
-    portal_user = session.exec(
-        select(PortalUser).where(
-            PortalUser.email == credentials.email,
-            PortalUser.deleted == False,
-        )
-    ).first()
+    portal_user = unit_of_work.portal_users.get_by_email(credentials.email)
 
     if not portal_user or not verify_password(
         credentials.password, portal_user.password_hash
@@ -73,8 +66,7 @@ def login_user(
 
     token = create_access_token(portal_user.email, portal_user.role)
     portal_user.ultimo_ingreso = datetime.now(UTC)
-    session.add(portal_user)
-    session.commit()
+    unit_of_work.portal_users.add(portal_user)
 
     response.set_cookie(
         key=ACCESS_TOKEN_COOKIE,

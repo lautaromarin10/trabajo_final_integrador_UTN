@@ -3,9 +3,8 @@ from typing import Annotated
 import jwt
 from fastapi import Cookie, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlmodel import select
 
-from app.core.database import SessionDep
+from app.core.database import UnitOfWorkDep
 from app.core.roles import PortalRole
 from app.core.security import decode_access_token
 from app.models.portal_user import PortalUser
@@ -18,7 +17,7 @@ def get_current_user(
         HTTPAuthorizationCredentials | None,
         Depends(bearer_scheme),
     ],
-    session: SessionDep,
+    unit_of_work: UnitOfWorkDep,
     access_token: Annotated[str | None, Cookie()] = None,
 ) -> PortalUser:
     unauthorized = HTTPException(
@@ -35,12 +34,7 @@ def get_current_user(
     except jwt.InvalidTokenError:
         raise unauthorized from None
 
-    user = session.exec(
-        select(PortalUser).where(
-            PortalUser.email == email,
-            PortalUser.deleted == False,
-        )
-    ).first()
+    user = unit_of_work.portal_users.get_by_email(email)
     if user is None:
         raise unauthorized
     return user
