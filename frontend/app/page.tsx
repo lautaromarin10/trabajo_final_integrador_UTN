@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Stars } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,11 +22,21 @@ export default function Home() {
             Reservá tu estadía y empezá a planificar tu próxima escapada.
           </p>
           <div className="mt-4 flex flex-row items-center justify-center flex-wrap gap-2">
-            <Link href={"/auth/signin"}>
-              <Button>Iniciar sesión</Button>
+            <Link
+              href={"/auth/signin"}
+              className={buttonVariants({
+                variant: "default",
+              })}
+            >
+              Iniciar sesión
             </Link>
-            <Link href={"/auth/signup"}>
-              <Button variant={"outline"}>Registrarse ahora</Button>
+            <Link
+              href={"/auth/signup"}
+              className={buttonVariants({
+                variant: "secondary",
+              })}
+            >
+              Registrarse ahora
             </Link>
           </div>
         </div>
