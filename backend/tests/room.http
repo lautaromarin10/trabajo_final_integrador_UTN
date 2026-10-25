@@ -1,0 +1,194 @@
+@baseUrl = http://localhost:8000
+@adminEmail = prueba@admin.com
+@adminPassword = pruebaPassword
+@hotelId = 1
+@roomTypeId = 1
+@roomNumber = {{$timestamp}}
+@userEmail = room-user-{{$guid}}@test.com
+@userPassword = Clave!123
+
+### Iniciar sesión como administrador
+# Esperado: 200
+# hotelId y roomTypeId tienen que ser un hotel y un tipo de habitación que existan.
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+### Crear cuenta de usuario
+# Esperado: 201
+# @name registerUser
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "apellido": "Pérez",
+  "tipo_documento": "DNI",
+  "numero_documento": "{{$guid}}",
+  "fecha_nacimiento": "1990-01-15",
+  "nacionalidad": "Argentina",
+  "email": "{{userEmail}}",
+  "password": "{{userPassword}}"
+}
+
+### Iniciar sesión como usuario
+# Esperado: 200
+# @name userLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{registerUser.response.body.$.email}}",
+  "password": "{{userPassword}}"
+}
+
+### Listar sin autenticación
+# Esperado: 401
+GET {{baseUrl}}/room/
+
+### Un usuario no puede crear una habitación
+# Esperado: 403
+POST {{baseUrl}}/room/
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "hotel_id": {{hotelId}},
+  "tipo_habitacion_id": {{roomTypeId}},
+  "numero": "{{roomNumber}}",
+  "descripcion": "Suite de prueba",
+  "piso": 1,
+  "estado_habitacion": "disponible",
+  "estado_limpieza": "limpia"
+}
+
+### Crear habitación
+# Esperado: 201
+# @name createRoom
+POST {{baseUrl}}/room/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "hotel_id": {{hotelId}},
+  "tipo_habitacion_id": {{roomTypeId}},
+  "numero": "{{roomNumber}}",
+  "descripcion": "Suite de prueba",
+  "piso": 1,
+  "estado_habitacion": "disponible",
+  "estado_limpieza": "limpia"
+}
+
+### No permitir duplicar el número
+# Esperado: 409
+POST {{baseUrl}}/room/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "hotel_id": {{hotelId}},
+  "tipo_habitacion_id": {{roomTypeId}},
+  "numero": "{{roomNumber}}",
+  "descripcion": "Otra suite",
+  "piso": 2,
+  "estado_habitacion": "disponible",
+  "estado_limpieza": "limpia"
+}
+
+### El usuario puede listar y filtrar habitaciones
+# Esperado: 200; respuesta con total, items, hasNextPage y hasPrevPage.
+GET {{baseUrl}}/room/?numero={{roomNumber}}&piso=1&estado_habitacion=disponible&skip=0&limit=10
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### El usuario puede consultar una habitación
+# Esperado: 200
+GET {{baseUrl}}/room/{{createRoom.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### Un usuario no puede modificar una habitación
+# Esperado: 403
+PATCH {{baseUrl}}/room/{{createRoom.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "piso": 3
+}
+
+### Actualizar habitación
+# Esperado: 200
+PATCH {{baseUrl}}/room/{{createRoom.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "piso": 2,
+  "estado_habitacion": "mantenimiento",
+  "estado_limpieza": "sucia"
+}
+
+### Rechazar campos null en la actualización
+# Esperado: 422
+PATCH {{baseUrl}}/room/{{createRoom.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "piso": null
+}
+
+### Un usuario no puede eliminar una habitación
+# Esperado: 403
+DELETE {{baseUrl}}/room/{{createRoom.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### Eliminar habitación
+# Esperado: 204
+DELETE {{baseUrl}}/room/{{createRoom.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### La habitación eliminada ya no se puede consultar
+# Esperado: 404
+GET {{baseUrl}}/room/{{createRoom.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### No permitir duplicar una habitación eliminada
+# Esperado: 409
+POST {{baseUrl}}/room/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "hotel_id": {{hotelId}},
+  "tipo_habitacion_id": {{roomTypeId}},
+  "numero": "{{roomNumber}}",
+  "descripcion": "Suite de prueba",
+  "piso": 1,
+  "estado_habitacion": "disponible",
+  "estado_limpieza": "limpia"
+}
+
+### Reactivar la habitación eliminada
+# Esperado: 200; conserva su ID.
+POST {{baseUrl}}/room/{{createRoom.response.body.$.id}}/reactivate
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### Consultar habitación reactivada
+# Esperado: 200
+GET {{baseUrl}}/room/{{createRoom.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### Rechazar un ID menor o igual a cero
+# Esperado: 422
+GET {{baseUrl}}/room/0
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### Rechazar un límite fuera del rango permitido
+# Esperado: 422
+GET {{baseUrl}}/room/?limit=101
+Authorization: Bearer {{userLogin.response.body.$.access_token}}

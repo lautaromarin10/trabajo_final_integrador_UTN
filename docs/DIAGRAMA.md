@@ -45,8 +45,8 @@ erDiagram
         string numero
         string descripcion
         int piso
-        string estado_habitacion
-        string estado_limpieza
+        string estado_habitacion "disponible | ocupada | fuera_de_servicio | mantenimiento"
+        string estado_limpieza "sucia | en_progreso | limpia"
     }
 
     PERSONA {

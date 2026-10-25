@@ -1,0 +1,190 @@
+@baseUrl = http://localhost:8000
+@adminEmail = prueba@admin.com
+@adminPassword = pruebaPassword
+@nombre = Doble {{$timestamp}}
+@userEmail = room-type-user-{{$guid}}@test.com
+@userPassword = Clave!123
+
+### Iniciar sesión como administrador
+# Esperado: 200
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+### Crear cuenta de usuario
+# Esperado: 201
+# @name registerUser
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nombre": "Ana",
+  "apellido": "Pérez",
+  "tipo_documento": "DNI",
+  "numero_documento": "{{$guid}}",
+  "fecha_nacimiento": "1990-01-15",
+  "nacionalidad": "Argentina",
+  "email": "{{userEmail}}",
+  "password": "{{userPassword}}"
+}
+
+### Iniciar sesión como usuario
+# Esperado: 200
+# @name userLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{registerUser.response.body.$.email}}",
+  "password": "{{userPassword}}"
+}
+
+### Listar sin autenticación
+# Esperado: 401
+GET {{baseUrl}}/room-type/
+
+### Un usuario no puede crear un tipo de habitación
+# Esperado: 403
+POST {{baseUrl}}/room-type/
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "nombre": "{{nombre}}",
+  "descripcion": "Habitación doble con balcón",
+  "capacidad_adultos": 2,
+  "capacidad_ninos": 1,
+  "cantidad_camas": 1,
+  "tamanio_m2": 25,
+  "precio": 15000
+}
+
+### Crear tipo de habitación
+# Esperado: 201
+# @name createRoomType
+POST {{baseUrl}}/room-type/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "nombre": "{{nombre}}",
+  "descripcion": "Habitación doble con balcón",
+  "capacidad_adultos": 2,
+  "capacidad_ninos": 1,
+  "cantidad_camas": 1,
+  "tamanio_m2": 25,
+  "precio": 15000
+}
+
+### No permitir duplicar el nombre
+# Esperado: 409
+POST {{baseUrl}}/room-type/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "nombre": "{{nombre}}",
+  "descripcion": "Otra doble",
+  "capacidad_adultos": 2,
+  "capacidad_ninos": 0,
+  "cantidad_camas": 1,
+  "tamanio_m2": 20,
+  "precio": 12000
+}
+
+### El usuario puede listar y filtrar tipos
+# Esperado: 200; respuesta con total, items, hasNextPage y hasPrevPage.
+GET {{baseUrl}}/room-type/?nombre=Doble&capacidad_adultos=2&cantidad_camas=1&skip=0&limit=10
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### El usuario puede consultar un tipo
+# Esperado: 200
+GET {{baseUrl}}/room-type/{{createRoomType.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### Un usuario no puede modificar un tipo
+# Esperado: 403
+PATCH {{baseUrl}}/room-type/{{createRoomType.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "precio": 18000
+}
+
+### Actualizar tipo de habitación
+# Esperado: 200
+PATCH {{baseUrl}}/room-type/{{createRoomType.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "precio": 18000,
+  "cantidad_camas": 2
+}
+
+### Rechazar campos null en la actualización
+# Esperado: 422
+PATCH {{baseUrl}}/room-type/{{createRoomType.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "precio": null
+}
+
+### Un usuario no puede eliminar un tipo
+# Esperado: 403
+DELETE {{baseUrl}}/room-type/{{createRoomType.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### Eliminar tipo de habitación
+# Esperado: 204
+DELETE {{baseUrl}}/room-type/{{createRoomType.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### El tipo eliminado ya no se puede consultar
+# Esperado: 404
+GET {{baseUrl}}/room-type/{{createRoomType.response.body.$.id}}
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### No permitir duplicar un tipo eliminado
+# Esperado: 409
+POST {{baseUrl}}/room-type/
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+  "nombre": "{{nombre}}",
+  "descripcion": "Habitación doble con balcón",
+  "capacidad_adultos": 2,
+  "capacidad_ninos": 1,
+  "cantidad_camas": 1,
+  "tamanio_m2": 25,
+  "precio": 15000
+}
+
+### Reactivar el tipo eliminado
+# Esperado: 200; conserva su ID.
+POST {{baseUrl}}/room-type/{{createRoomType.response.body.$.id}}/reactivate
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### Consultar tipo reactivado
+# Esperado: 200
+GET {{baseUrl}}/room-type/{{createRoomType.response.body.$.id}}
+Authorization: Bearer {{adminLogin.response.body.$.access_token}}
+
+### Rechazar un ID menor o igual a cero
+# Esperado: 422
+GET {{baseUrl}}/room-type/0
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
+
+### Rechazar un límite fuera del rango permitido
+# Esperado: 422
+GET {{baseUrl}}/room-type/?limit=101
+Authorization: Bearer {{userLogin.response.body.$.access_token}}
