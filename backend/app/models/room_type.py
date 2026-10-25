@@ -1,9 +1,10 @@
-from models.generic_model import GenericModel
 from sqlmodel import Field
 
+from app.models.generic_model import GenericModel
 
-class Roomtype(GenericModel, table=True):
-    __tablename__ = "room_type"
+
+class RoomType(GenericModel, table=True):
+    __tablename__ = "tipo_habitacion"
 
     nombre: str
     descripcion: str | None = None
