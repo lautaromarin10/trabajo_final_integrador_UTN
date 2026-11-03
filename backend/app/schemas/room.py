@@ -8,7 +8,6 @@ from app.utils.validators import reject_null_value
 
 
 class RoomBase(BaseModel):
-    hotel_id: int = Field(..., gt=0, examples=[1])
     tipo_habitacion_id: int = Field(..., gt=0, examples=[1])
     numero: str = Field(..., pattern=r"^[1-9]\d*$", examples=["101"])
     descripcion: str | None = Field(None, examples=["Suite con vista a la playa"])
@@ -43,7 +42,6 @@ class RoomUpdate(BaseModel):
 class RoomRead(GenericSchema):
     model_config = ConfigDict(from_attributes=True)
 
-    hotel_id: int
     tipo_habitacion_id: int
     numero: str
     descripcion: str | None = None

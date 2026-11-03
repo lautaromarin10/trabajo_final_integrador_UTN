@@ -27,7 +27,6 @@ class RoomRepository(Repository[Room]):
         self,
         skip: int,
         limit: int,
-        hotel_id: int | None = None,
         tipo_habitacion_id: int | None = None,
         numero: str | None = None,
         descripcion: str | None = None,
@@ -36,8 +35,6 @@ class RoomRepository(Repository[Room]):
         estado_limpieza: RoomCleaningStatus | None = None,
     ) -> tuple[int, list[Room]]:
         filters: list[ColumnElement[bool]] = [col(Room.deleted) == False]
-        if hotel_id is not None:
-            filters.append(Room.hotel_id == hotel_id)
         if tipo_habitacion_id is not None:
             filters.append(Room.tipo_habitacion_id == tipo_habitacion_id)
         if numero:
