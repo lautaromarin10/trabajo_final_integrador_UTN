@@ -1,7 +1,6 @@
 @baseUrl = http://localhost:8000
 @adminEmail = prueba@admin.com
 @adminPassword = pruebaPassword
-@hotelId = 1
 @roomTypeId = 1
 @roomNumber = {{$timestamp}}
 @userEmail = room-user-{{$guid}}@test.com
@@ -9,7 +8,7 @@
 
 ### Iniciar sesión como administrador
 # Esperado: 200
-# hotelId y roomTypeId tienen que ser un hotel y un tipo de habitación que existan.
+# roomTypeId tiene que ser un tipo de habitación que exista.
 # @name adminLogin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
@@ -58,7 +57,6 @@ Authorization: Bearer {{userLogin.response.body.$.access_token}}
 Content-Type: application/json
 
 {
-  "hotel_id": {{hotelId}},
   "tipo_habitacion_id": {{roomTypeId}},
   "numero": "{{roomNumber}}",
   "descripcion": "Suite de prueba",
@@ -75,7 +73,6 @@ Authorization: Bearer {{adminLogin.response.body.$.access_token}}
 Content-Type: application/json
 
 {
-  "hotel_id": {{hotelId}},
   "tipo_habitacion_id": {{roomTypeId}},
   "numero": "{{roomNumber}}",
   "descripcion": "Suite de prueba",
@@ -91,7 +88,6 @@ Authorization: Bearer {{adminLogin.response.body.$.access_token}}
 Content-Type: application/json
 
 {
-  "hotel_id": {{hotelId}},
   "tipo_habitacion_id": {{roomTypeId}},
   "numero": "{{roomNumber}}",
   "descripcion": "Otra suite",
@@ -164,7 +160,6 @@ Authorization: Bearer {{adminLogin.response.body.$.access_token}}
 Content-Type: application/json
 
 {
-  "hotel_id": {{hotelId}},
   "tipo_habitacion_id": {{roomTypeId}},
   "numero": "{{roomNumber}}",
   "descripcion": "Suite de prueba",

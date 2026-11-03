@@ -1,9 +1,7 @@
 ```mermaid
 erDiagram
-    HOTEL ||--o{ HABITACION : tiene
     TIPO_HABITACION ||--o{ HABITACION : define
 
-    HOTEL ||--o{ RESERVA : gestiona
     CLIENTE ||--o{ RESERVA : realiza
     USUARIO_PORTAL o|--o{ RESERVA : crea
     RESERVA ||--o{ HISTORIAL_ESTADO_RESERVA : registra
@@ -19,14 +17,6 @@ erDiagram
 
     ORIGEN_CLIENTE ||--o{ CLIENTE : define
 
-    HOTEL {
-        int id PK
-        string nombre
-        string descripcion
-        string telefono
-        string email
-    }
-
     TIPO_HABITACION {
         int id PK
         string nombre
@@ -40,7 +30,6 @@ erDiagram
 
     HABITACION {
         int id PK
-        int hotel_id FK
         int tipo_habitacion_id FK
         string numero
         string descripcion
@@ -86,7 +75,6 @@ erDiagram
 
     RESERVA {
         int id PK
-        int hotel_id FK
         int cliente_id FK
         int usuario_creador_id FK
         string codigo
@@ -132,3 +120,4 @@ erDiagram
   - datetime deleted_at
 
 - Todos los registros deben ser marcados como eliminados con soft delete.
+- El sistema administra un único hotel. No hay entidad HOTEL ni columna `hotel_id`: habitaciones y reservas pertenecen a ese establecimiento. Nombre, dirección y contacto del hotel no los consume ningún módulo; si hicieran falta, van en configuración y no en una tabla con clave foránea.

@@ -23,7 +23,6 @@ class RoomCleaningStatus(str, Enum):
 class Room(GenericModel, table=True):
     __tablename__ = "habitacion"
 
-    hotel_id: int = Field(foreign_key="hotel.id", index=True)
     tipo_habitacion_id: int = Field(foreign_key="tipo_habitacion.id", index=True)
     numero: str = Field(index=True)
     descripcion: str | None = None

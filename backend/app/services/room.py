@@ -25,25 +25,20 @@ def _ensure_room_type_exists(unit_of_work: UnitOfWork, tipo_habitacion_id: int) 
         raise HTTPException(status_code=404, detail="Tipo de habitación no encontrado")
 
 
-def _ensure_hotel_exists(unit_of_work: UnitOfWork, hotel_id: int) -> None:
-    if not unit_of_work.hotels.get_active(hotel_id):
-        raise HTTPException(status_code=404, detail="Hotel no encontrado")
-
-
 def create_room(data: RoomCreate, unit_of_work: UnitOfWork) -> Room:
     _ensure_number_available(unit_of_work, data.numero)
-    _ensure_hotel_exists(unit_of_work, data.hotel_id)
     _ensure_room_type_exists(unit_of_work, data.tipo_habitacion_id)
 
     room = Room(**data.model_dump())
-    return unit_of_work.rooms.add(room)
+    unit_of_work.rooms.add(room)
+    unit_of_work.rooms.flush()
+    return room
 
 
 def get_rooms(
     unit_of_work: UnitOfWork,
     skip: int = 0,
     limit: int = 20,
-    hotel_id: int | None = None,
     tipo_habitacion_id: int | None = None,
     numero: str | None = None,
     descripcion: str | None = None,
@@ -54,7 +49,6 @@ def get_rooms(
     total, items = unit_of_work.rooms.get_page(
         skip,
         limit,
-        hotel_id,
         tipo_habitacion_id,
         numero,
         descripcion,
@@ -107,6 +101,5 @@ def reactivate_room(unit_of_work: UnitOfWork, room_id: int) -> Room:
         raise HTTPException(status_code=409, detail="La habitación ya está activa")
 
     _ensure_number_available(unit_of_work, room.numero, exclude_room_id=room_id)
-    _ensure_hotel_exists(unit_of_work, room.hotel_id)
     _ensure_room_type_exists(unit_of_work, room.tipo_habitacion_id)
     return unit_of_work.rooms.reactivate(room)
